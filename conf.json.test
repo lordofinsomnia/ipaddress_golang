@@ -3,13 +3,13 @@
   "from":
   {
     "from":"ip address deamon", 
-    "email":"mickom669@yahoo.com"
+    "email":"somemail@mail.com"
   },
   "mailing list":
   [
     {
       "to":"ip address deamon", 
-      "email":"mickom669@yahoo.com"
+      "email":"somemail@mail.com"
     }
   ]
 }
