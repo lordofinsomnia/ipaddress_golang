@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		new ip address:
+		<br>
+		ipadress:{{.IPAddress}}
+		<br>		
+		{{with .Services}}			
+			{{range .}}
+			<p>
+				Name:	{{.Name}}
+				Link:	<a href={{.Link}}>{{.LinkDescription}}</a>
+				Port:	{{.Port}}				
+			</p>
+			{{end}}
+		{{end}}		
+	</body>
+</html>

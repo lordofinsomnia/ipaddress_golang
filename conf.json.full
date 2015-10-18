@@ -1,0 +1,35 @@
+{
+  "title":"mail",
+  "from":
+  {
+    "from":"ip address deamon", 
+    "email":"mickom669@yahoo.com"
+  },
+  "mailing list":
+  [
+    {
+      "to": "ip address deamon",
+      "email": "stevazzz@yahoo.com"
+    },
+    {
+      "to":"ip address deamon", 
+      "email":"rasapastuv@gmail.com"
+    },
+    {
+      "to":"ip address deamon", 
+      "email":"d7trx@yahoo.com"
+    },
+    {
+      "to":"ip address deamon", 
+      "email":"jankovic.m85@gmail.com"
+    },
+    {
+      "to":"ip address deamon", 
+      "email":"brunchvolicrunch@gmail.com"
+    },
+    {
+      "to":"ip address deamon", 
+      "email":"mickom669@yahoo.com"
+    }
+  ]
+}
