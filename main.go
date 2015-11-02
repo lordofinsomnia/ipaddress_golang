@@ -146,11 +146,11 @@ func main() {
 
 	var ipConfigFilePath string
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err == nil {
-		ipConfigFilePath = dir + "/ipconfig.conf"
-	} else {
+	if err != nil {
+		fmt.Println("error parsing filepath")
 		log.Fatal(err)
 	}
+	ipConfigFilePath = dir + "/ipconfig.conf"
 
 	fmt.Println("deamon path: " + dir)
 	fmt.Println("ip config file path: " + ipConfigFilePath)
@@ -196,19 +196,6 @@ func main() {
 		fmt.Println(pageServices)
 
 		page := &Page{IPAddress: ipaddress, Services: pageServices}
-
-		/*fileBody, err := ioutil.ReadFile("body.html")
-		if err != nil {
-			fmt.Println("error loading body.html")
-			log.Fatal(err)
-		}*/
-
-		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			fmt.Println("error parsing filepath")
-			log.Fatal(err)
-		}
-
 		mailBody, err := template.ParseFiles(dir + "/body.html")
 		if err != nil {
 			fmt.Println("error loading body.html")
@@ -256,6 +243,5 @@ func initConfig() {
 }
 
 func packServiceLink(ipaddress string, serviceName string, servicePort int) string {
-	//return /*"<a href=" + */"http://" + ipaddress + ":" + strconv.Itoa(servicePort) /*+ ">"*/ + serviceName + " " + string(ipaddress) + ":" + strconv.Itoa(servicePort);// + "</a>"
 	return "http://" + ipaddress + ":" + strconv.Itoa(servicePort)
 }
