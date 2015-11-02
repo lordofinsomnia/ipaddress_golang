@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -49,6 +50,10 @@ var config jsonConfig
 var tos map[string]mail.Address
 var from mail.Address
 
+var smtpServer string
+var senderMailAddress string
+var senderPassword string
+
 func encodeRFC2047(String string) string {
 	// use mail's rfc2047 to encode any string
 	addr := mail.Address{String, ""}
@@ -56,9 +61,6 @@ func encodeRFC2047(String string) string {
 }
 
 func sendMail(body string) {
-	smtpServer := os.Getenv("IP_ADDRESS_DEAMON_SMTP_SERVER")
-	senderMailAddress := os.Getenv("IP_ADDRESS_DEAMON_USERNAME")
-	senderPassword := os.Getenv("IP_ADDRESS_DEAMON_PASSWORD")
 	if smtpServer != "" && senderMailAddress != "" && senderPassword != "" {
 		auth := smtp.PlainAuth(
 			"",
@@ -128,6 +130,12 @@ func findFirst(m map[string]mail.Address) mail.Address {
 }
 
 func main() {
+
+	flag.StringVar(&smtpServer, "IP_ADDRESS_DEAMON_SMTP_SERVER", "smtp.server.address", "a string")
+	flag.StringVar(&senderMailAddress, "IP_ADDRESS_DEAMON_USERNAME", "username", "a string")
+	flag.StringVar(&senderPassword, "IP_ADDRESS_DEAMON_PASSWORD", "password", "a string")
+	flag.Parse()
+
 	resp, err := http.Get("http://myexternalip.com/raw")
 	if err != nil {
 		os.Stderr.WriteString(err.Error())
@@ -164,6 +172,7 @@ func main() {
 		readBody, _ = ioutil.ReadFile(ipConfigFilePath)
 		if string(readBody) == string(body) {
 			fmt.Println("ip has not been changed")
+
 			sendIt = false
 		} else {
 			fmt.Println("ip has been changed")
@@ -207,13 +216,6 @@ func main() {
 		s := doc.String()
 		fmt.Println(s)
 		ioutil.WriteFile(dir+"/mail.html", []byte(s), 0644)
-
-		/*mailBody := "<!DOCTYPE html><html><body>new ip address:" + "<br>" + "<br>" + string(ipaddress)
-		for _, v := range services {
-			mailBody += "<br>" + v
-		}
-		mailBody += "</body></html>"*/
-
 		sendMail(s)
 	}
 }
