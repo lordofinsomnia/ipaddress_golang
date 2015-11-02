@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -13,6 +12,7 @@ import (
 	"net/mail"
 	"net/smtp"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -30,10 +30,10 @@ type jsonConfig struct {
 }
 
 type ServicesType struct {
-	Name string
-	Link string
+	Name            string
+	Link            string
 	LinkDescription string
-	Port int
+	Port            int
 }
 type Page struct {
 	IPAddress string
@@ -144,13 +144,24 @@ func main() {
 
 	sendIt := true
 
-	_, err = os.Open("ipconfig")
+	var ipConfigFilePath string
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err == nil {
+		ipConfigFilePath = dir + "/ipconfig.conf"
+	} else {
+		log.Fatal(err)
+	}
+
+	fmt.Println("deamon path: " + dir)
+	fmt.Println("ip config file path: " + ipConfigFilePath)
+
+	_, err = os.Open(ipConfigFilePath)
 	if err != nil {
-		ioutil.WriteFile("ipconfig", body, 0644)
+		ioutil.WriteFile(ipConfigFilePath, body, 0644)
 
 	} else {
 		var readBody []byte
-		readBody, _ = ioutil.ReadFile("ipconfig")
+		readBody, _ = ioutil.ReadFile(ipConfigFilePath)
 		if string(readBody) == string(body) {
 			fmt.Println("ip has not been changed")
 			sendIt = false
@@ -158,10 +169,10 @@ func main() {
 			fmt.Println("ip has been changed")
 			fmt.Println("old ip:" + string(readBody))
 			fmt.Println("new ip:" + string(body))
-			ioutil.WriteFile("ipconfig", body, 0644)
+			ioutil.WriteFile(ipConfigFilePath, body, 0644)
 		}
 	}
-	
+
 	if sendIt {
 		ipaddress := strings.Replace(string(body), "\n", "", -1)
 		services := make(map[string]string)
@@ -170,18 +181,18 @@ func main() {
 		services["torrent"] = packServiceLink(ipaddress, "torrent", 18080)
 
 		pageServices := []ServicesType{ServicesType{Name: "ssh",
-																				 				 Link: services["ssh"], 
-																								 Port: 443, 
-																								 LinkDescription: (services["ssh"])},
-																		ServicesType{Name: "gitlab", 
-																								 Link: services["gitlab"], 
-																								 Port: 10080, 
-																								 LinkDescription: services["gitlab"]},
-																		ServicesType{Name: "torrent", 
-																								 Link: services["torrent"], 
-																								 Port: 18080, 
-																								 LinkDescription: services["torrent"]}}
-		
+			Link:            services["ssh"],
+			Port:            443,
+			LinkDescription: (services["ssh"])},
+			ServicesType{Name: "gitlab",
+				Link:            services["gitlab"],
+				Port:            10080,
+				LinkDescription: services["gitlab"]},
+			ServicesType{Name: "torrent",
+				Link:            services["torrent"],
+				Port:            18080,
+				LinkDescription: services["torrent"]}}
+
 		fmt.Println(pageServices)
 
 		page := &Page{IPAddress: ipaddress, Services: pageServices}
@@ -192,7 +203,13 @@ func main() {
 			log.Fatal(err)
 		}*/
 
-		mailBody, err := template.ParseFiles("body.html")
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			fmt.Println("error parsing filepath")
+			log.Fatal(err)
+		}
+
+		mailBody, err := template.ParseFiles(dir + "/body.html")
 		if err != nil {
 			fmt.Println("error loading body.html")
 			log.Fatal(err)
@@ -202,7 +219,7 @@ func main() {
 		mailBody.Execute(&doc, page)
 		s := doc.String()
 		fmt.Println(s)
-		ioutil.WriteFile("mail.html", []byte(s), 0644)
+		ioutil.WriteFile(dir+"/mail.html", []byte(s), 0644)
 
 		/*mailBody := "<!DOCTYPE html><html><body>new ip address:" + "<br>" + "<br>" + string(ipaddress)
 		for _, v := range services {
@@ -216,7 +233,7 @@ func main() {
 
 func readConfig() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	confFile, err := ioutil.ReadFile(dir+"/conf.json")
+	confFile, err := ioutil.ReadFile(dir + "/conf.json")
 	if err != nil {
 		fmt.Println("error loading configuration")
 		log.Fatal(err)
@@ -240,5 +257,5 @@ func initConfig() {
 
 func packServiceLink(ipaddress string, serviceName string, servicePort int) string {
 	//return /*"<a href=" + */"http://" + ipaddress + ":" + strconv.Itoa(servicePort) /*+ ">"*/ + serviceName + " " + string(ipaddress) + ":" + strconv.Itoa(servicePort);// + "</a>"
-	return "http://" + ipaddress + ":" + strconv.Itoa(servicePort) 
+	return "http://" + ipaddress + ":" + strconv.Itoa(servicePort)
 }
