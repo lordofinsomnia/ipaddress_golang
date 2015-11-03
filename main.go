@@ -56,7 +56,7 @@ var senderPassword string
 
 func encodeRFC2047(String string) string {
 	// use mail's rfc2047 to encode any string
-	addr := mail.Address{String, ""}
+	addr := mail.Address{Name: "", Address: ""}
 	return strings.Trim(addr.String(), " <>")
 }
 
@@ -238,7 +238,7 @@ func readConfig() {
 func initConfig() {
 	tos = make(map[string]mail.Address)
 	for k, v := range config.MailingList {
-		tos[string(k)] = mail.Address{v.To, v.Email}
+		tos[string(k)] = mail.Address{Name: v.To, Address: v.Email}
 	}
 	from.Address = config.From.Email
 	from.Name = config.From.From
