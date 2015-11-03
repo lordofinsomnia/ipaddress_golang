@@ -39,11 +39,6 @@ type servicesType struct {
 type page struct {
 	IPAddress string
 	Services  []servicesType
-	/*Services []struct {
-		Name string
-		Link string
-		Port int
-	}*/
 }
 
 var config jsonConfig
@@ -68,8 +63,6 @@ func sendMail(body string) {
 			senderPassword,
 			smtpServer,
 		)
-
-		//firstMail := findFirst(tos)
 
 		header := make(map[string]string)
 		header["From"] = from.String()
@@ -101,7 +94,6 @@ func sendMail(body string) {
 			from.Address,
 			[]string{from.Address},
 			[]byte(message),
-			//[]byte("This is the email body."),
 		)
 		if err != nil {
 			log.Fatal(err)
