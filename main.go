@@ -30,15 +30,15 @@ type jsonConfig struct {
 	} `json:"mailing list"`
 }
 
-type ServicesType struct {
+type servicesType struct {
 	Name            string
 	Link            string
 	LinkDescription string
 	Port            int
 }
-type Page struct {
+type page struct {
 	IPAddress string
-	Services  []ServicesType
+	Services  []servicesType
 	/*Services []struct {
 		Name string
 		Link string
@@ -189,22 +189,22 @@ func main() {
 		services["ssh"] = packServiceLink(ipaddress, "ssh", 443)
 		services["torrent"] = packServiceLink(ipaddress, "torrent", 18080)
 
-		pageServices := []ServicesType{ServicesType{Name: "ssh",
+		pageServices := []servicesType{servicesType{Name: "ssh",
 			Link:            services["ssh"],
 			Port:            443,
 			LinkDescription: (services["ssh"])},
-			ServicesType{Name: "gitlab",
+			servicesType{Name: "gitlab",
 				Link:            services["gitlab"],
 				Port:            10080,
 				LinkDescription: services["gitlab"]},
-			ServicesType{Name: "torrent",
+			servicesType{Name: "torrent",
 				Link:            services["torrent"],
 				Port:            18080,
 				LinkDescription: services["torrent"]}}
 
 		fmt.Println(pageServices)
 
-		page := &Page{IPAddress: ipaddress, Services: pageServices}
+		htmlpage := &page{IPAddress: ipaddress, Services: pageServices}
 		mailBody, err := template.ParseFiles(dir + "/body.html")
 		if err != nil {
 			fmt.Println("error loading body.html")
@@ -212,7 +212,7 @@ func main() {
 		}
 
 		var doc bytes.Buffer
-		mailBody.Execute(&doc, page)
+		mailBody.Execute(&doc, htmlpage)
 		s := doc.String()
 		fmt.Println(s)
 		ioutil.WriteFile(dir+"/mail.html", []byte(s), 0644)
