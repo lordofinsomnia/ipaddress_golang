@@ -48,6 +48,7 @@ var from mail.Address
 var smtpServer string
 var senderMailAddress string
 var senderPassword string
+var mailBody string
 
 func encodeRFC2047(String string) string {
 	// use mail's rfc2047 to encode any string
@@ -125,6 +126,7 @@ func main() {
 	flag.StringVar(&smtpServer, "IP_ADDRESS_DEAMON_SMTP_SERVER", "smtp.server.address", "a string")
 	flag.StringVar(&senderMailAddress, "IP_ADDRESS_DEAMON_USERNAME", "username", "a string")
 	flag.StringVar(&senderPassword, "IP_ADDRESS_DEAMON_PASSWORD", "password", "a string")
+	flag.StringVar(&mailBody, "IP_ADDRESS_DEAMON_MAIL_BODY_FILE", "body.html", "filename to mail body")
 	flag.Parse()
 
 	resp, err := http.Get("http://myexternalip.com/raw")
@@ -143,16 +145,17 @@ func main() {
 
 	sendIt := true
 
-	var ipConfigFilePath string
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		fmt.Println("error parsing filepath")
 		log.Fatal(err)
 	}
-	ipConfigFilePath = dir + "/ipconfig.conf"
+	ipConfigFilePath := dir + "/ipconfig.conf"
+	mailTemplateFilePath := dir + "/" + mailBody
 
 	fmt.Println("deamon path: " + dir)
 	fmt.Println("ip config file path: " + ipConfigFilePath)
+	fmt.Println("mailTemplate file path: " + mailTemplateFilePath)
 
 	_, err = os.Open(ipConfigFilePath)
 	if err != nil {
@@ -196,14 +199,14 @@ func main() {
 		fmt.Println(pageServices)
 
 		htmlpage := &page{IPAddress: ipaddress, Services: pageServices}
-		mailBody, err := template.ParseFiles(dir + "/body.html")
+		mailTemplate, err := template.ParseFiles(mailTemplateFilePath)
 		if err != nil {
 			fmt.Println("error loading body.html")
 			log.Fatal(err)
 		}
 
 		var doc bytes.Buffer
-		mailBody.Execute(&doc, htmlpage)
+		mailTemplate.Execute(&doc, htmlpage)
 		s := doc.String()
 		fmt.Println(s)
 		ioutil.WriteFile(dir+"/mail.html", []byte(s), 0644)
