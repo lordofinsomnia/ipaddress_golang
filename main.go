@@ -24,7 +24,7 @@ type jsonConfig struct {
 		From  string `json:"from"`
 		Email string `json:"email"`
 	} `json:"from"`
-	Mailing_List []struct {
+	MailingList []struct {
 		Email string `json:"email"`
 		To    string `json:"to"`
 	} `json:"mailing list"`
@@ -230,14 +230,14 @@ func readConfig() {
 
 	json.Unmarshal(confFile, &config)
 
-	for _, v := range config.Mailing_List {
+	for _, v := range config.MailingList {
 		fmt.Printf("to: %+v, email:%+v\n", v.To, v.Email)
 	}
 }
 
 func initConfig() {
 	tos = make(map[string]mail.Address)
-	for k, v := range config.Mailing_List {
+	for k, v := range config.MailingList {
 		tos[string(k)] = mail.Address{v.To, v.Email}
 	}
 	from.Address = config.From.Email
