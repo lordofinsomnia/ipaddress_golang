@@ -77,8 +77,7 @@ func sendMail(body string) {
 		for _, v := range tos {
 			header["To"] += v.String() + ", "
 		}
-
-		header["Subject"] = encodeRFC2047(config.Title)
+		header["Subject"] = config.Title
 		header["MIME-Version"] = "1.0"
 
 		header["Content-Type"] = "text/html; charset=\"utf-8\""
