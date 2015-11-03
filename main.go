@@ -19,7 +19,7 @@ import (
 )
 
 type jsonConfig struct {
-	Title string `json:title`
+	Title string `json:"title"`
 	From  struct {
 		From  string `json:"from"`
 		Email string `json:"email"`
