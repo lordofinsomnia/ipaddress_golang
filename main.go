@@ -30,6 +30,13 @@ type jsonConfig struct {
 	} `json:"mailing list"`
 }
 
+type servicesConf struct {
+	Services []struct {
+		Name string `json:"Name"`
+		Port int    `json:"Port"`
+	} `json:"Services"`
+}
+
 type servicesType struct {
 	Name            string
 	Link            string
@@ -41,7 +48,8 @@ type page struct {
 	Services  []servicesType
 }
 
-var config jsonConfig
+var mailConfig jsonConfig
+var servicesConfig servicesConf
 var tos map[string]mail.Address
 var from mail.Address
 
@@ -71,7 +79,7 @@ func sendMail(body string) {
 		for _, v := range tos {
 			header["To"] += v.String() + ", "
 		}
-		header["Subject"] = config.Title
+		header["Subject"] = mailConfig.Title
 		header["MIME-Version"] = "1.0"
 
 		header["Content-Type"] = "text/html; charset=\"utf-8\""
@@ -137,8 +145,10 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	readConfig()
-	initConfig()
+	readMailConfig()
+	readServicesConfig()
+	initMailConfig()
+	initServicesConfig()
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
@@ -179,9 +189,9 @@ func main() {
 	if sendIt {
 		ipaddress := strings.Replace(string(body), "\n", "", -1)
 		services := make(map[string]string)
-		services["gitlab"] = packServiceLink(ipaddress, "gitlab", 10080)
-		services["ssh"] = packServiceLink(ipaddress, "ssh", 443)
-		services["torrent"] = packServiceLink(ipaddress, "torrent", 18080)
+		for _, v := range servicesConfig.Services {
+			services[v.Name] = packServiceLink(ipaddress, v.Name, v.Port)
+		}
 
 		pageServices := []servicesType{servicesType{Name: "ssh",
 			Link:            services["ssh"],
@@ -214,7 +224,7 @@ func main() {
 	}
 }
 
-func readConfig() {
+func readMailConfig() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	confFile, err := ioutil.ReadFile(dir + "/conf.json")
 	if err != nil {
@@ -222,20 +232,44 @@ func readConfig() {
 		log.Fatal(err)
 	}
 
-	json.Unmarshal(confFile, &config)
+	json.Unmarshal(confFile, &mailConfig)
 
-	for _, v := range config.MailingList {
+	for _, v := range mailConfig.MailingList {
 		fmt.Printf("to: %+v, email:%+v\n", v.To, v.Email)
 	}
 }
 
-func initConfig() {
+func readServicesConfig() {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	confFile, err := ioutil.ReadFile(dir + "/services.json")
+	if err != nil {
+		fmt.Println("error loading configuration")
+		log.Fatal(err)
+	}
+
+	json.Unmarshal(confFile, &servicesConfig)
+
+	for _, v := range servicesConfig.Services {
+		fmt.Printf("name: %+v, port:%+v\n", v.Name, v.Port)
+	}
+}
+
+func initMailConfig() {
 	tos = make(map[string]mail.Address)
-	for k, v := range config.MailingList {
+	for k, v := range mailConfig.MailingList {
 		tos[string(k)] = mail.Address{Name: v.To, Address: v.Email}
 	}
-	from.Address = config.From.Email
-	from.Name = config.From.From
+	from.Address = mailConfig.From.Email
+	from.Name = mailConfig.From.From
+}
+
+func initServicesConfig() {
+	/*tos = make(map[string]mail.Address)
+	for k, v := range mailConfig.MailingList {
+		tos[string(k)] = mail.Address{Name: v.To, Address: v.Email}
+	}
+	from.Address = mailConfig.From.Email
+	from.Name = mailConfig.From.From*/
 }
 
 func packServiceLink(ipaddress string, serviceName string, servicePort int) string {
