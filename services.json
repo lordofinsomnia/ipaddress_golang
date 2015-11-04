@@ -2,16 +2,12 @@
   "Services":
   [
     {
-      "Name":	"ssh",
-      "Port":	443
+      "Name":	"http",
+      "Port":	80
     },
     {
-      "Name":	"gitlab",
-      "Port":	10080
-    },
-    {
-      "Name":	"torrent",
-      "Port":	18080
+      "Name":	"https",
+      "Port":	8080
     }
   ]
 }
