@@ -1,0 +1,17 @@
+{
+  "Services":
+  [
+    {
+      "Name":	"ssh",
+      "Port":	443
+    },
+    {
+      "Name":	"gitlab",
+      "Port":	10080
+    },
+    {
+      "Name":	"torrent",
+      "Port":	18080
+    }
+  ]
+}

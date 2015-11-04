@@ -188,30 +188,17 @@ func main() {
 
 	if sendIt {
 		ipaddress := strings.Replace(string(body), "\n", "", -1)
-		services := make(map[string]string)
-		for _, v := range servicesConfig.Services {
-			services[v.Name] = packServiceLink(ipaddress, v.Name, v.Port)
+		pageServices := make([]servicesType, len(servicesConfig.Services))
+		for i, v := range servicesConfig.Services {
+			pageServices[i] = servicesType{Name: v.Name, Port: v.Port, Link: packServiceLink(ipaddress, v.Name, v.Port), LinkDescription: v.Name}
 		}
-
-		pageServices := []servicesType{servicesType{Name: "ssh",
-			Link:            services["ssh"],
-			Port:            443,
-			LinkDescription: (services["ssh"])},
-			servicesType{Name: "gitlab",
-				Link:            services["gitlab"],
-				Port:            10080,
-				LinkDescription: services["gitlab"]},
-			servicesType{Name: "torrent",
-				Link:            services["torrent"],
-				Port:            18080,
-				LinkDescription: services["torrent"]}}
 
 		fmt.Println(pageServices)
 
 		htmlpage := &page{IPAddress: ipaddress, Services: pageServices}
 		mailTemplate, err := template.ParseFiles(mailTemplateFilePath)
 		if err != nil {
-			fmt.Println("error loading body.html")
+			fmt.Println("error loading:" + mailTemplateFilePath)
 			log.Fatal(err)
 		}
 
