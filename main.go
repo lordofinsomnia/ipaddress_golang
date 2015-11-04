@@ -117,18 +117,6 @@ func sendMail(body string) {
 	}
 }
 
-func findFirst(m map[string]mail.Address) mail.Address {
-	fmt.Println("find first start")
-	var someValue mail.Address
-	for _, someValue := range m {
-		//fmt.Println("key: " + key + ", address: " + someValue.Address + ", from: " + someValue.Name)
-		fmt.Println("find first end someValue found! Returning " + someValue.String())
-		return someValue
-	}
-	fmt.Println("find first end someValue not found! Returning nil")
-	return someValue
-}
-
 func main() {
 
 	flag.StringVar(&smtpServer, "IP_ADDRESS_DEAMON_SMTP_SERVER", "smtp.server.address", "a string")
