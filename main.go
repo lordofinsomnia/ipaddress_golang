@@ -136,7 +136,6 @@ func main() {
 	readMailConfig()
 	readServicesConfig()
 	initMailConfig()
-	initServicesConfig()
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
@@ -236,15 +235,6 @@ func initMailConfig() {
 	}
 	from.Address = mailConfig.From.Email
 	from.Name = mailConfig.From.From
-}
-
-func initServicesConfig() {
-	/*tos = make(map[string]mail.Address)
-	for k, v := range mailConfig.MailingList {
-		tos[string(k)] = mail.Address{Name: v.To, Address: v.Email}
-	}
-	from.Address = mailConfig.From.Email
-	from.Name = mailConfig.From.From*/
 }
 
 func packServiceLink(ipaddress string, serviceName string, servicePort int) string {
